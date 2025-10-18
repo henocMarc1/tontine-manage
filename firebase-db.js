@@ -22,9 +22,23 @@ let app = null;
 // Initialiser Firestore
 async function initFirestore() {
     try {
-        // Charger la configuration depuis le serveur
-        const response = await fetch('/api/firebase-config');
-        const firebaseConfig = await response.json();
+        let firebaseConfig;
+        
+        // Essayer d'abord de charger depuis le serveur (pour Replit avec variables d'environnement)
+        try {
+            const response = await fetch('/api/firebase-config');
+            if (response.ok) {
+                firebaseConfig = await response.json();
+                console.log('Configuration Firebase chargée depuis le serveur');
+            } else {
+                throw new Error('API non disponible');
+            }
+        } catch (apiError) {
+            // Si l'API n'est pas disponible, charger depuis firebase-config.js (pour GitHub Pages / local)
+            console.log('Chargement de la configuration Firebase depuis le fichier local');
+            const configModule = await import('./firebase-config.js');
+            firebaseConfig = configModule.firebaseConfig;
+        }
         
         // Vérifier si Firebase est déjà initialisé
         const { getApps } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
