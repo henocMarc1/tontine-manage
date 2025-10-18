@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Tontines</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-coins"></i>
+                <span>Gestionnaire de Tontines</span>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Basculer le mode sombre">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Gestionnaire</span>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Se déconnecter">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de bord
+                </button>
+                <button class="nav-btn" data-section="members">
+                    <i class="fas fa-users"></i>
+                    Membres
+                </button>
+                <button class="nav-btn" data-section="tontines">
+                    <i class="fas fa-handshake"></i>
+                    Tontines
+                </button>
+                <button class="nav-btn" data-section="payments">
+                    <i class="fas fa-credit-card"></i>
+                    Gestion des Paiements
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+ <!-- Dashboard Section -->
+<section id="dashboard" class="section active">
+    <div class="dashboard-header">
+        <h2><i class="fas fa-tachometer-alt"></i> Tableau de bord des Tontines</h2>
+        <p class="dashboard-subtitle">Vue d'ensemble de vos activités de tontines</p>
+    </div>
+    
+    <!-- Stats Cards Row -->
+    <div class="dashboard-stats">
+        <div class="stat-card stat-members">
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h4>MEMBRES TOTAL</h4>
+                    <div class="stat-icon members-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <h2 id="total-members-display">0</h2>
+            </div>
+            <div class="stat-decoration">
+                <div class="decoration-circle"></div>
+                <div class="decoration-dots"></div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-tontines">
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h4>TONTINES ACTIVES</h4>
+                    <div class="stat-icon tontines-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                </div>
+                <h2 id="active-tontines-display">0</h2>
+            </div>
+            <div class="stat-decoration">
+                <div class="decoration-circle"></div>
+                <div class="decoration-dots"></div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-payments">
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h4>PAIEMENTS DU MOIS</h4>
+                    <div class="stat-icon payments-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                </div>
+                <h2 id="monthly-payments-display">0</h2>
+            </div>
+            <div class="stat-decoration">
+                <div class="decoration-circle"></div>
+                <div class="decoration-dots"></div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-amount">
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h4>MONTANT TOTAL</h4>
+                    <div class="stat-icon amount-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <h2 id="total-amount-display">0 FCFA</h2>
+            </div>
+            <div class="stat-decoration">
+                <div class="decoration-circle"></div>
+                <div class="decoration-dots"></div>
+            </div>
+        </div>
+    </div>
+
+<!-- Charts and Activities Row -->
+<div class="dashboard-main-content">
+    <div class="dashboard-row">
+        <!-- Section Évolution des Paiements -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-line"></i> Évolution des Paiements</h3>
+                <p class="chart-subtitle" id="chart-growth">Croissance de +0% cette année</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="paymentsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Section Activités Récentes -->
+        <div class="recent-activities">
+            <div class="section-header">
+                <h3><i class="fas fa-clock"></i> Activités Récentes</h3>
+            </div>
+            <div id="recent-activities-list" class="activities-list">
+                <!-- Les activités seront ajoutées dynamiquement -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+       
+    </div>
+
+  
+
+            <!-- Members Section -->
+            <section id="members" class="section">
+                <div class="section-hero">
+                    <div class="section-header">
+                        <h2>Gestion des Membres</h2>
+                        <button class="btn btn-primary" id="add-member-btn">
+                            <i class="fas fa-plus"></i>
+                            Ajouter un membre
+                        </button>
+                    </div>
+                    <div class="section-illustration">
+                        <img src="gens.png" alt="Illustration Membres" />
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="member-search" placeholder="Rechercher un membre...">
+                    </div>
+                </div>
+
+                <div class="members-grid" id="members-grid">
+                    <!-- Members will be dynamically populated -->
+                </div>
+            </section>
+
+            <!-- Tontines Section -->
+            <section id="tontines" class="section">
+                <div class="section-hero">
+                    <div class="section-header">
+                        <h2>Gestion des Tontines</h2>
+                        <button class="btn btn-primary" id="add-tontine-btn">
+                        <i class="fas fa-plus"></i>
+                        Créer une tontine
+                    </button>
+                    </div>
+                    <div class="section-illustration">
+                        <img src="tontine.png" alt="Illustration Tontines" />
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="tontine-search" placeholder="Rechercher une tontine...">
+                    </div>
+                </div>
+
+                <div class="tontines-grid" id="tontines-grid">
+                    <!-- Tontines will be dynamically populated -->
+                </div>
+            </section>
+
+            <!-- Payments Section -->
+            <section id="payments" class="section">
+                <div class="section-hero">
+                    <div class="section-header">
+                        <h2>Gestion des Paiements</h2>
+                        <button class="btn btn-primary" id="add-payment-btn">
+                            <i class="fas fa-plus"></i>
+                            Nouveau Paiement
+                        </button>
+                    </div>
+                    <div class="section-illustration">
+                        <img src="paiement.png" alt="Illustration Paiements" />
+                    </div>
+                </div>
+
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="payment-search" placeholder="Rechercher un paiement...">
+                        </div>
+                        <select id="payment-tontine-filter">
+                            <option value="">Toutes les tontines</option>
+                        </select>
+                        <select id="payment-status-filter">
+                            <option value="">Tous les statuts</option>
+                            <option value="paid">Payé</option>
+                            <option value="pending">En attente</option>
+                            <option value="overdue">En retard</option>
+                        </select>
+                        <input type="month" id="payment-month-filter" placeholder="Mois">
+                        <button class="btn btn-secondary" id="filter-payments-btn">
+                            <i class="fas fa-filter"></i> Filtrer
+                        </button>
+                        <button class="btn btn-primary" id="monthly-report-btn">
+                            <i class="fas fa-file-alt"></i> Rapport Mensuel
+                        </button>
+                        <button class="btn btn-success" id="export-db-btn">
+                            <i class="fas fa-download"></i> Exporter BD
+                        </button>
+                        <button class="btn btn-info" id="import-db-btn">
+                            <i class="fas fa-upload"></i> Importer BD
+                        </button>
+                    </div>
+                </div>
+
+                <div class="payments-summary">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="payments-collected">0 FCFA</h3>
+                                <p>Collecté ce mois</p>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="payments-pending">0 FCFA</h3>
+                                <p>Payés ce mois</p>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3 id="payments-overdue">0 FCFA</h3>
+                                <p>Pénalités</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payments-list" id="payments-list">
+                    <!-- Payments will be dynamically populated -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Member Modal -->
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="member-modal-title">Nouveau Membre</h3>
+                <button class="close-btn" onclick="closeModal('member-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="member-form">
+                <div class="form-group">
+                    <label for="member-name">Nom complet *</label>
+                    <input type="text" id="member-name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="member-email">Email</label>
+                        <input type="email" id="member-email">
+                    </div>
+                    <div class="form-group">
+                        <label for="member-phone">Téléphone *</label>
+                        <input type="tel" id="member-phone" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="member-cni">CNI/Passeport</label>
+                        <input type="text" id="member-cni">
+                    </div>
+                    <div class="form-group">
+                        <label for="member-address">Adresse</label>
+                        <input type="text" id="member-address">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('member-modal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Member Details Modal -->
+    <div id="member-details-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="member-details-title">Détails du Membre</h3>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary btn-sm" id="edit-member-btn">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="btn btn-danger btn-sm" id="delete-member-btn">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </div>
+                <button class="close-btn" onclick="closeModal('member-details-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Member Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchMemberTab('personal')">
+                    <i class="fas fa-user"></i> Informations
+                </button>
+                <button class="tab-btn" onclick="switchMemberTab('tontines')">
+                    <i class="fas fa-handshake"></i> Tontines
+                </button>
+                <button class="tab-btn" onclick="switchMemberTab('payments')">
+                    <i class="fas fa-credit-card"></i> Paiements
+                </button>
+            </div>
+            <div class="member-details" id="member-details-content">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tontine Modal -->
+    <div id="tontine-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="tontine-modal-title">Nouvelle Tontine</h3>
+                <button class="close-btn" onclick="closeModal('tontine-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="tontine-form">
+                <div class="form-group">
+                    <label for="tontine-name">Nom de la tontine *</label>
+                    <input type="text" id="tontine-name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tontine-amount">Montant par tour (FCFA) *</label>
+                        <input type="number" id="tontine-amount" required min="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="tontine-frequency">Fréquence *</label>
+                        <select id="tontine-frequency" required>
+                            <option value="">Sélectionner...</option>
+                            <option value="Hebdomadaire">Hebdomadaire</option>
+                            <option value="Mensuelle">Mensuelle</option>
+                            <option value="Trimestrielle">Trimestrielle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tontine-start-date">Date de début *</label>
+                        <input type="date" id="tontine-start-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tontine-rounds">Nombre de tours *</label>
+                        <input type="number" id="tontine-rounds" required min="2" max="20">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tontine-description">Description</label>
+                    <textarea id="tontine-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Sélection des membres avec positions *</label>
+                    <div class="member-search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="member-search-input" placeholder="Rechercher un membre par nom ou CNI...">
+                        </div>
+                        <div class="search-results" id="search-results" style="display: none;">
+                            <!-- Search results will appear here -->
+                        </div>
+                    </div>
+                    <div id="members-selector" class="members-selector-with-positions">
+                        <!-- Selected members will be populated dynamically -->
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('tontine-modal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer la tontine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tontine Details Modal -->
+    <div id="tontine-details-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="tontine-details-title">Détails de la Tontine</h3>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary btn-sm" id="edit-tontine-btn">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="btn btn-danger btn-sm" id="delete-tontine-btn">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </div>
+                <button class="close-btn" onclick="closeModal('tontine-details-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Tontine Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTontineTab('overview')">
+                    <i class="fas fa-chart-line"></i> Vue d'ensemble
+                </button>
+                <button class="tab-btn" onclick="switchTontineTab('members')">
+                    <i class="fas fa-users"></i> Membres & Positions
+                </button>
+                <button class="tab-btn" onclick="switchTontineTab('payments')">
+                    <i class="fas fa-credit-card"></i> Historique des Paiements
+                </button>
+                <button class="tab-btn" onclick="switchTontineTab('rounds')">
+                    <i class="fas fa-sync-alt"></i> Gestion des Tours
+                </button>
+            </div>
+            <div class="tontine-details" id="tontine-details-content">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="payment-modal-title">Nouveau Paiement</h3>
+                <button class="close-btn" onclick="closeModal('payment-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="payment-form">
+                <div class="form-group">
+                    <label for="payment-tontine">Tontine *</label>
+                    <select id="payment-tontine" required>
+                        <option value="">Sélectionner une tontine...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payment-member">Membre *</label>
+                    <select id="payment-member" required disabled onchange="updateAvailableRounds()">
+                        <option value="">Sélectionner d'abord une tontine</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payment-round">Tour à payer *</label>
+                    <select id="payment-round" required disabled>
+                        <option value="">Sélectionner d'abord un membre</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="payment-amount">Montant (FCFA) *</label>
+                        <input type="number" id="payment-amount" required min="0" readonly>
+                        <small class="penalty-info" id="penalty-info" style="display: none; color: #f59e0b; font-weight: 500;">
+                            <i class="fas fa-exclamation-triangle"></i> Pénalité appliquée pour retard de paiement
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-date">Date de paiement *</label>
+                        <input type="date" id="payment-date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="payment-type">Type de paiement *</label>
+                    <select id="payment-type" required>
+                        <option value="contribution">Contribution</option>
+                        <option value="payout">Versement</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payment-method">Mode de paiement *</label>
+                    <select id="payment-method" required>
+                        <option value="">Sélectionner...</option>
+                        <option value="cash">Espèces</option>
+                        <option value="mobile">Mobile Money</option>
+                        <option value="bank">Virement bancaire</option>
+                        <option value="check">Chèque</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payment-reference">Référence</label>
+                    <input type="text" id="payment-reference" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="payment-notes">Notes</label>
+                    <textarea id="payment-notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('payment-modal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer le paiement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Report Modal -->
+    <div id="report-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Rapport Mensuel</h3>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="printReport()">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="exportReport()">
+                        <i class="fas fa-download"></i> Exporter
+                    </button>
+                </div>
+                <button class="close-btn" onclick="closeModal('report-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="report-content" class="report-content">
+                <!-- Report content will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for database import -->
+    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+   <script src="app.js"></script>
+    <script>
+        // Initialize the application when the page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
