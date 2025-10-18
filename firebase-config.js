@@ -1,14 +1,15 @@
 // Firebase Configuration
-// Les clés sont chargées depuis les variables d'environnement pour la sécurité
+// Ce fichier est utilisé pour déploiement local et GitHub Pages
+// Sur Replit, les clés sont chargées depuis les variables d'environnement via le serveur
 
 const firebaseConfig = {
-    apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
-    authDomain: "FIREBASE_AUTH_DOMAIN_PLACEHOLDER",
-    projectId: "FIREBASE_PROJECT_ID_PLACEHOLDER",
-    storageBucket: "FIREBASE_STORAGE_BUCKET_PLACEHOLDER",
-    messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER",
-    appId: "FIREBASE_APP_ID_PLACEHOLDER",
-    measurementId: "FIREBASE_MEASUREMENT_ID_PLACEHOLDER"
+    apiKey: "AIzaSyCZej9YltyxigiDKtmP4JK6bWMxzdZ-L6I",
+    authDomain: "tontine-manager-4ca6a.firebaseapp.com",
+    projectId: "tontine-manager-4ca6a",
+    storageBucket: "tontine-manager-4ca6a.firebasestorage.app",
+    messagingSenderId: "301277281975",
+    appId: "1:301277281975:web:45081924cae58078c01732",
+    measurementId: "G-9ZJYTBME2Z"
 };
 
 export { firebaseConfig };
