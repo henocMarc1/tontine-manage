@@ -3979,6 +3979,7 @@ textarea:focus {
     }
 }
 
+
 @media (max-width: 768px) {
     .receipt-info {
         grid-template-columns: 1fr;
