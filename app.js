@@ -2442,58 +2442,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // Ajouter des données de test si aucune données n'existent
-    initializeTestData();
 });
 
-// Fonction pour initialiser des données de test
-function initializeTestData() {
-    if (state.members.length === 0) {
-        console.log('Ajout de données de test...');
-        
-        // Ajouter quelques membres de test
-        const testMembers = [
-            {
-                id: generateId(),
-                name: 'ESDRAS',
-                email: 'marie.dubois@email.com',
-                phone: '+225 07 89 85 84 98',
-                cni: 'CNI123456',
-                address: '123 Rue de la République',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: generateId(),
-                name: 'MARC',
-                email: 'jean.martin@email.com',
-                phone: '+225 05 45 47 79 23',
-                cni: 'CNI789123',
-                address: '456 Avenue des Champs',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: generateId(),
-                name: 'HENOC',
-                email: 'sophie.laurent@email.com',
-                phone: '+225 ',
-                cni: 'CNI456789',
-                address: '789 Boulevard Saint-Michel',
-                createdAt: new Date().toISOString()
-            }
-        ];
-        
-        state.members = testMembers;
-        saveData();
-        console.log('Données de test ajoutées avec succès !');
-        
-        // Mettre à jour l'affichage si on est sur la section des membres
-        if (state.currentSection === 'members') {
-            renderMembers();
-        }
-        updateDashboard();
-    }
-}
 
 function getPaymentTypeText(type) {
     const typeMap = {
